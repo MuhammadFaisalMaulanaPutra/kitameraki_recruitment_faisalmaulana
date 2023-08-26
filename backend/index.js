@@ -16,10 +16,10 @@ app.get("/", (req, res) => {
   res.send("Welcome to root URL of Server");
 });
 
-app.get("/task", index);
-app.post("/task", create);
-app.put("/task", update);
-app.delete("/task", drop);
+app.get("/api/task", index);
+app.post("/api/task", create);
+app.put("/api/task", update);
+app.delete("/api/task", drop);
 
 app.listen(PORT, (error) => {
   if (!error) {

@@ -37,7 +37,7 @@ function create(req, res) {
 }
 
 function update(req, res) {
-  if (req.query.id - 1 >= taskList.length) {
+  if (req.query.id >= taskList.length) {
     return res.status(400).json({
       status: 400,
       msg: "Not Found",
@@ -46,7 +46,7 @@ function update(req, res) {
 
   const data = req.body;
 
-  taskList[req.query.id - 1] = data;
+  taskList[req.query.id] = data;
 
   return res.status(200).json({
     status: 200,
@@ -56,14 +56,14 @@ function update(req, res) {
 }
 
 function drop(req, res) {
-  if (req.query.id - 1 >= taskList.length) {
+  if (req.query.id >= taskList.length) {
     return res.status(400).json({
       status: 400,
       msg: "Not Found",
     });
   }
 
-  taskList.splice(req.query.id - 1, 1);
+  taskList.splice(req.query.id, 1);
 
   return res.status(200).json({
     status: 200,
