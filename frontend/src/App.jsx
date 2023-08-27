@@ -6,22 +6,62 @@ import InputCard from "./components/InputCard";
 function App() {
   const [formToggle, setFormToggle] = useState(false);
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadMoreItems = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    console.log("get");
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/task?page=${Math.floor(data.length / 5) + 1}`
+      );
+      const newItems = response.data.data;
+      setData(mergeArrays(data, newItems, "id"));
+    } catch (error) {
+      console.error("Error loading more items:", error);
+    }
+
+    setIsLoading(false);
+  };
+
+  const mergeArrays = (arr1, arr2, key) => {
+    let uniqueObjects = new Set([...arr1, ...arr2].map((item) => item[key]));
+    return [...uniqueObjects].map((uniqueKey) => {
+      return (
+        arr1.find((item) => item[key] === uniqueKey) ||
+        arr2.find((item) => item[key] === uniqueKey)
+      );
+    });
+  };
 
   useEffect(() => {
-    fetchData(); // Panggil fungsi permintaan data
+    loadMoreItems();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/task");
-      setData(response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        console.log("mentok");
+        loadMoreItems();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isLoading]);
 
   const handleToggle = () => {
     setFormToggle(!formToggle);
+  };
+
+  const handleSubmit = () => {
+    setData(data.splice(0));
+    loadMoreItems();
   };
 
   return (
@@ -38,9 +78,9 @@ function App() {
         </div>
         {!formToggle ? (
           <>
-            <div className="flex justify-center mb-7">
+            <div className="flex justify-center mb-2">
               <button
-                className="bg-white border-2 border-black hover:bg-black hover:text-white hover:border-white px-4 py-2 rounded-md transition duration-300"
+                className="bg-white border-2 border-black hover:bg-black hover:text-white px-4 py-2 rounded-md transition duration-300"
                 onClick={handleToggle}
               >
                 + Add Task
@@ -48,20 +88,21 @@ function App() {
             </div>
           </>
         ) : (
-          <InputCard onToggle={handleToggle} onSubmit={fetchData} />
+          <InputCard onToggle={handleToggle} onSubmit={handleSubmit} />
         )}
         <div className="flex justify-center">
           <div className="flex-col my-6 ">
             {data.map((item, index) => (
               <TaskCard
                 key={index}
-                id={index}
+                id={item.id}
                 value={item}
-                onSubmit={fetchData}
+                onSubmit={handleSubmit}
               />
             ))}
           </div>
         </div>
+        {isLoading && <p className="flex justify-center">Loading...</p>}
       </div>
     </>
   );

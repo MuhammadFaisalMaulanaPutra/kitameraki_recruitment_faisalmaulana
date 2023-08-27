@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Label } from "@fluentui/react/lib/Label";
 import { TextField, asAsync } from "@fluentui/react";
 
 function TaskCard({ id, value, onSubmit }) {
   const [edit, setEdit] = useState(false);
   const [edited, setEdited] = useState(value);
+  const [req, setReq] = useState(false);
+
+  const checkValue = () => {
+    if (edited.title) {
+      updateData();
+    }
+    setReq(true);
+  };
 
   const handleEdit = () => {
     setEdit(!edit);
@@ -43,13 +52,15 @@ function TaskCard({ id, value, onSubmit }) {
           </>
         ) : (
           <>
+            <Label required>Title</Label>
             <TextField
-              label="Title"
               value={edited.title}
               onChange={(e) => setEdited({ ...edited, title: e.target.value })}
             />
+            {req ? <Label>This field must be filled in</Label> : <></>}
+
+            <Label className="mt-2">Description (Optional)</Label>
             <TextField
-              label="description"
               multiline
               autoAdjustHeight
               value={edited.description}
@@ -57,7 +68,7 @@ function TaskCard({ id, value, onSubmit }) {
                 setEdited({ ...edited, description: e.target.value })
               }
             />
-            <button className="bg-white py-2 mr-3" onClick={updateData}>
+            <button className="bg-white py-2 mr-3" onClick={checkValue}>
               Save
             </button>
             <button className="bg-white py-2" onClick={handleEdit}>
