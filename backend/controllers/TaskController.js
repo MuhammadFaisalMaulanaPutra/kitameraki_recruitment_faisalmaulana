@@ -1,20 +1,12 @@
 let taskList = [];
+let id = 0;
+const itemsPerPage = 5;
 
 function index(req, res) {
-  if (req.query.id - 1 >= taskList.length) {
-    return res.status(400).json({
-      status: 400,
-      msg: "Not Found",
-    });
-  }
-
-  let data;
-
-  if (req.query.id) {
-    data = taskList[req.query.id - 1];
-  } else {
-    data = taskList;
-  }
+  const page = parseInt(req.query.page) || 1;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const data = taskList.slice(startIndex, endIndex);
 
   return res.status(200).json({
     status: 200,
@@ -24,10 +16,14 @@ function index(req, res) {
 }
 
 function create(req, res) {
-  const data = req.body;
-  //   data.slug = data.title.toLowerCase().replace(" ", "-");
+  const data = {
+    id: id + 1,
+    ...req.body,
+  };
 
   taskList.push(data);
+
+  id++;
 
   return res.status(200).json({
     status: 200,
@@ -37,16 +33,22 @@ function create(req, res) {
 }
 
 function update(req, res) {
-  if (req.query.id >= taskList.length) {
+  const checkVal = taskList.filter((task) => task.id === Number(req.query.id));
+
+  if (checkVal.length === 0) {
     return res.status(400).json({
       status: 400,
       msg: "Not Found",
     });
   }
 
-  const data = req.body;
+  const data = {
+    id: Number(req.query.id),
+    ...req.body,
+  };
 
-  taskList[req.query.id] = data;
+  taskList[taskList.findIndex((task) => task.id === Number(req.query.id))] =
+    data;
 
   return res.status(200).json({
     status: 200,
@@ -56,14 +58,18 @@ function update(req, res) {
 }
 
 function drop(req, res) {
-  if (req.query.id >= taskList.length) {
+  const checkVal = taskList.filter((task) => task.id === Number(req.query.id));
+
+  if (checkVal.length === 0) {
     return res.status(400).json({
       status: 400,
       msg: "Not Found",
     });
   }
 
-  taskList.splice(req.query.id, 1);
+  const index = taskList.findIndex((task) => task.id === Number(req.query.id));
+
+  taskList.splice(index, 1);
 
   return res.status(200).json({
     status: 200,
