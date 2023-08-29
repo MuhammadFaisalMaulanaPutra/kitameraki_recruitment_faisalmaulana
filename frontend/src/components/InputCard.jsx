@@ -1,12 +1,33 @@
 import React, { useState } from "react";
-import { TextField } from "@fluentui/react";
 import axios from "axios";
+import { TextField } from "@fluentui/react";
 import { Label } from "@fluentui/react/lib/Label";
+import { DatePicker } from "@fluentui/react";
+import { SpinButton } from "@fluentui/react";
+import { DayOfWeek } from "@fluentui/date-time-utilities";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
+const optionForm = [
+  {
+    id: "input-field",
+    name: "Input Field",
+  },
+  {
+    id: "date-picker",
+    name: "Date Picker",
+  },
+  {
+    id: "spin-button",
+    name: "Spin Button",
+  },
+];
 
 function InputCard(props) {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [req, setReq] = useState(false);
+  const [elements, setElements] = useState([]);
+  const [options, setOption] = useState(optionForm);
 
   const checkValue = () => {
     if (title) {
@@ -26,32 +47,138 @@ function InputCard(props) {
     props.onSubmit();
     props.onToggle();
   };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    if (result.source.droppableId === "form-elements") {
+      // Handle reordering elements within the form
+      const newElements = Array.from(elements);
+      const [movedElement] = newElements.splice(result.source.index, 1);
+      newElements.splice(result.destination.index, 0, movedElement);
+
+      setElements(newElements);
+    } else if (result.source.droppableId === "add-element") {
+      const addElement = {
+        id: `form-${elements.length + 1}`,
+        type: options[result.source.index].id,
+      };
+
+      const newElements = Array.from(elements);
+      newElements.splice(result.destination.index, 0, addElement);
+
+      setElements(newElements);
+    }
+  };
+
   return (
     <>
-      <div className="flex justify-center">
-        <div className="flex-col w-600">
-          <div className="bg-white rounded-lg p-3 border-black border-2 ">
-            <Label required>Title</Label>
-            <TextField onChange={(e) => setTitle(e.target.value)} />
-            {req ? <Label>This field must be filled in</Label> : <></>}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex justify-center">
+          <div className="flex-col w-600">
+            <div className="bg-white rounded-lg p-3 border-black border-2 mb-10">
+              <Label required>Title</Label>
+              <TextField onChange={(e) => setTitle(e.target.value)} />
+              {req ? <Label>This field must be filled in</Label> : <></>}
 
-            <Label className="mt-2">Description (Optional)</Label>
-            <TextField
-              multiline
-              autoAdjustHeight
-              onChange={(e) => setDesc(e.target.value)}
-            />
-            <div className="flex mt-4">
-              <button className="bg-white py-2 me-4" onClick={checkValue}>
-                Save
-              </button>
-              <button className="bg-white py-2" onClick={props.onToggle}>
-                Cancel
-              </button>
+              <Label className="mt-2">Description (Optional)</Label>
+              <TextField
+                multiline
+                autoAdjustHeight
+                onChange={(e) => setDesc(e.target.value)}
+              />
+
+              <Label className="mt-2">Optional Form</Label>
+              <Droppable droppableId="form-elements" direction="vertical">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="rounded-lg p-2 border-black border-2 min-h-[50px]"
+                  >
+                    {elements.map((element, index) => (
+                      <Draggable
+                        key={element.id}
+                        draggableId={element.id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                            className="mb-3"
+                          >
+                            <Label className="mb-1">{element.type}</Label>
+                            {element.type == "input-field" ? (
+                              <TextField />
+                            ) : (
+                              <></>
+                            )}
+                            {element.type == "date-picker" ? (
+                              <DatePicker />
+                            ) : (
+                              <></>
+                            )}
+                            {element.type == "spin-button" ? (
+                              <SpinButton />
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+              <Droppable
+                droppableId="add-element"
+                direction="horizontal"
+                isDropDisabled={true}
+              >
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="flex justify-center my-6 gap-3"
+                  >
+                    {console.log(options)}
+                    {options.map((option, index) => (
+                      <Draggable
+                        key={option.id}
+                        draggableId={option.id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                            className="bg-white border-2 border-black hover:bg-black hover:text-white px-4 py-2 rounded-md transition duration-300"
+                          >
+                            {option.name}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+              <div className="flex mt-4">
+                <button className="bg-white py-2 me-4" onClick={checkValue}>
+                  Save
+                </button>
+                <button className="bg-white py-2" onClick={props.onToggle}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </DragDropContext>
     </>
   );
 }

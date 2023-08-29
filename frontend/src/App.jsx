@@ -86,23 +86,23 @@ function App() {
                 + Add Task
               </button>
             </div>
+            <div className="flex justify-center">
+              <div className="flex-col my-6 ">
+                {data.map((item, index) => (
+                  <TaskCard
+                    key={index}
+                    id={item.id}
+                    value={item}
+                    onSubmit={handleSubmit}
+                  />
+                ))}
+              </div>
+            </div>
+            {isLoading && <p className="flex justify-center">Loading...</p>}
           </>
         ) : (
           <InputCard onToggle={handleToggle} onSubmit={handleSubmit} />
         )}
-        <div className="flex justify-center">
-          <div className="flex-col my-6 ">
-            {data.map((item, index) => (
-              <TaskCard
-                key={index}
-                id={item.id}
-                value={item}
-                onSubmit={handleSubmit}
-              />
-            ))}
-          </div>
-        </div>
-        {isLoading && <p className="flex justify-center">Loading...</p>}
       </div>
     </>
   );
