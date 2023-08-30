@@ -85,7 +85,6 @@ function OpForm({ index, element, onDelete, onChange }) {
       )}
       {element.type == "spin-button" ? (
         <SpinButton
-          label="Pilih nilai"
           value={edited.value}
           min={0}
           max={100}

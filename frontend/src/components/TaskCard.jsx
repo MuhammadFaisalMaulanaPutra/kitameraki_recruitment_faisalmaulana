@@ -46,7 +46,7 @@ function TaskCard({ id, value, onSubmit }) {
         {!edit ? (
           <>
             <h2 className="text-lg font-semibold">{value.title}</h2>
-            <Label className="text-gray-600 mb-2">
+            <Label className="text-gray-600 mb-4">
               {value.description.length == 0 ? (
                 <>No Description</>
               ) : (
@@ -55,11 +55,14 @@ function TaskCard({ id, value, onSubmit }) {
             </Label>
             {value.options.length != 0 ? (
               <>
-                <p className="text-sm font-semibold">Additional Information</p>
+                <p className="text-sm font-semibold mb-1">Additional Information</p>
                 {value.options.map((element, index) => (
                   <>
                     <p className="text-sm" key={index}>
-                      {element.title}: {element.value}
+                      {element.title}:{" "}
+                      {element.type == "date-picker"
+                        ? Date(element.value)
+                        : element.value}
                     </p>
                   </>
                 ))}
