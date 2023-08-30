@@ -14,10 +14,7 @@ function InputCard(props) {
     }
     setReq(true);
   };
-
-  //method "storeCar"
   const storeData = async () => {
-    //send data to server
     await axios.post("http://localhost:5000/api/task", {
       title: title,
       description: desc,
