@@ -1,13 +1,13 @@
 
 # Task Management App - kitameraki_recruitment
 
-## Run Backend Server
-
 Clone the project
 
 ```bash
   git clone https://github.com/MuhammadFaisalMaulanaPutra/kitameraki_recruitment_faisalmaulana.git
 ```
+
+## Run Backend Server
 
 Go to the backend folder and run the following command in the terminal to install the node package
 
