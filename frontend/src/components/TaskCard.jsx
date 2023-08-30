@@ -39,13 +39,37 @@ function TaskCard({ id, value, onSubmit }) {
       <div className="bg-white rounded-lg p-3 border-black border-2 w-600 my-2">
         {!edit ? (
           <>
-            <h2 className="text-lg font-semibold mb-2">{value.title}</h2>
-            <p className="text-gray-600">{value.description}</p>
+            <h2 className="text-lg font-semibold">{value.title}</h2>
+            <Label className="text-gray-600 mb-2">
+              {value.description.length == 0 ? (
+                <>No Description</>
+              ) : (
+                value.description
+              )}
+            </Label>
+            {value.options.length != 0 ? (
+              <>
+                <p className="text-sm font-semibold">Additional Information</p>
+                {value.options.map((element, index) => (
+                  <>
+                    <p className="text-sm" key={index}>
+                      {element.title}: {element.value}
+                    </p>
+                  </>
+                ))}
+              </>
+            ) : (
+              <></>
+            )}
+
             <div className="flex mt-4">
-              <button className="bg-white py-2 mr-3" onClick={handleEdit}>
+              <button
+                className="bg-white py-2 mr-3 text-sm"
+                onClick={handleEdit}
+              >
                 Edit
               </button>
-              <button className="bg-white py-2" onClick={deleteData}>
+              <button className="bg-white py-2 text-sm" onClick={deleteData}>
                 Delete
               </button>
             </div>

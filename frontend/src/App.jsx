@@ -88,6 +88,7 @@ function App() {
             </div>
             <div className="flex justify-center">
               <div className="flex-col my-6 ">
+                {console.log(data)}
                 {data.map((item, index) => (
                   <TaskCard
                     key={index}

@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { TextField } from "@fluentui/react";
 import { Label } from "@fluentui/react/lib/Label";
-import { DatePicker } from "@fluentui/react";
-import { SpinButton } from "@fluentui/react";
-import { DayOfWeek } from "@fluentui/date-time-utilities";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import OpForm from "./OpForm";
 
 const optionForm = [
   {
@@ -42,6 +40,7 @@ function InputCard(props) {
     await axios.post("http://localhost:5000/api/task", {
       title: title,
       description: desc,
+      options: elements,
     });
 
     props.onSubmit();
@@ -62,6 +61,7 @@ function InputCard(props) {
       const addElement = {
         id: `form-${elements.length + 1}`,
         type: options[result.source.index].id,
+        title: options[result.source.index].name,
       };
 
       const newElements = Array.from(elements);
@@ -69,6 +69,19 @@ function InputCard(props) {
 
       setElements(newElements);
     }
+  };
+  const handleDeleteForm = (index) => {
+    const newElements = Array.from(elements);
+    newElements.splice(index, 1);
+
+    setElements(newElements);
+  };
+
+  const handleChange = (index, change) => {
+    const newElements = Array.from(elements);
+    newElements[index] = change;
+
+    setElements(newElements);
   };
 
   return (
@@ -108,23 +121,14 @@ function InputCard(props) {
                             {...provided.dragHandleProps}
                             ref={provided.innerRef}
                             className="mb-3"
+                            key={index}
                           >
-                            <Label className="mb-1">{element.type}</Label>
-                            {element.type == "input-field" ? (
-                              <TextField />
-                            ) : (
-                              <></>
-                            )}
-                            {element.type == "date-picker" ? (
-                              <DatePicker />
-                            ) : (
-                              <></>
-                            )}
-                            {element.type == "spin-button" ? (
-                              <SpinButton />
-                            ) : (
-                              <></>
-                            )}
+                            <OpForm
+                              index={index}
+                              element={element}
+                              onDelete={handleDeleteForm}
+                              onChange={handleChange}
+                            />
                           </div>
                         )}
                       </Draggable>
@@ -144,7 +148,6 @@ function InputCard(props) {
                     ref={provided.innerRef}
                     className="flex justify-center my-6 gap-3"
                   >
-                    {console.log(options)}
                     {options.map((option, index) => (
                       <Draggable
                         key={option.id}
