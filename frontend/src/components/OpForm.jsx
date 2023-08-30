@@ -5,10 +5,9 @@ import { DatePicker } from "@fluentui/react";
 import { SpinButton } from "@fluentui/react";
 import { BiTrashAlt, BiEditAlt, BiSave } from "react-icons/bi";
 
-function OpFormList({ index, element, onDelete, onChange }) {
+function OpForm({ index, element, onDelete, onChange }) {
   const [isEdit, setIsEdit] = useState(false);
   const [edited, setEdited] = useState(element);
-  const [spinValue, setSpinValue] = useState(0);
 
   useEffect(() => {
     onChange(index, edited);
@@ -25,7 +24,6 @@ function OpFormList({ index, element, onDelete, onChange }) {
   const onSpinButtonChange = useCallback((event, newValue) => {
     if (newValue != undefined) {
       setEdited({ ...edited, value: newValue });
-      setSpinValue(newValue);
     }
   });
 
@@ -70,19 +68,25 @@ function OpFormList({ index, element, onDelete, onChange }) {
       </div>
 
       {element.type == "input-field" ? (
-        <TextField onChange={(e) => handleEditChange(e.target.value)} />
+        <TextField
+          value={edited.value}
+          onChange={(e) => handleEditChange(e.target.value)}
+        />
       ) : (
         <></>
       )}
       {element.type == "date-picker" ? (
-        <DatePicker onSelectDate={(date) => handleEditChange(date)} />
+        <DatePicker
+          value={!edited.value ? undefined : new Date(edited.value)}
+          onSelectDate={(date) => handleEditChange(date)}
+        />
       ) : (
         <></>
       )}
       {element.type == "spin-button" ? (
         <SpinButton
           label="Pilih nilai"
-          value={spinValue}
+          value={edited.value}
           min={0}
           max={100}
           step={1}
@@ -97,4 +101,4 @@ function OpFormList({ index, element, onDelete, onChange }) {
   );
 }
 
-export default OpFormList;
+export default OpForm;

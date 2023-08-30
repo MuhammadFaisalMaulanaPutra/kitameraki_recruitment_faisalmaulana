@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Label } from "@fluentui/react/lib/Label";
-import { TextField, asAsync } from "@fluentui/react";
+import { TextField } from "@fluentui/react";
+import OpFormList from "./OpFormList";
 
 function TaskCard({ id, value, onSubmit }) {
   const [edit, setEdit] = useState(false);
@@ -32,6 +33,11 @@ function TaskCard({ id, value, onSubmit }) {
     await axios.delete(`http://localhost:5000/api/task?id=${id}`);
 
     onSubmit();
+  };
+
+  const handleChange = (value) => {
+    setEdited({ ...edited, options: value });
+    console.log(edited);
   };
 
   return (
@@ -92,6 +98,8 @@ function TaskCard({ id, value, onSubmit }) {
                 setEdited({ ...edited, description: e.target.value })
               }
             />
+            <Label className="mt-2">Optional Form</Label>
+            <OpFormList value={edited.options} onChange={handleChange} />
             <button className="bg-white py-2 mr-3" onClick={checkValue}>
               Save
             </button>
